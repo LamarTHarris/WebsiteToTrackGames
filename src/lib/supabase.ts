@@ -5,14 +5,29 @@ const supabaseKey =
   import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
   import.meta.env.VITE_SUPABASE_ANON_KEY
 
-if (!supabaseUrl || !supabaseKey) {
-  console.warn(
-    'Missing VITE_SUPABASE_URL or VITE_SUPABASE_PUBLISHABLE_KEY. Copy .env.example to .env.local and fill in your Supabase project values.',
+const hasValidConfig =
+  Boolean(supabaseUrl) &&
+  Boolean(supabaseKey) &&
+  !supabaseUrl.includes('your-project') &&
+  !supabaseUrl.includes('placeholder') &&
+  supabaseKey !== 'your-publishable-or-anon-key' &&
+  supabaseKey !== 'placeholder-key'
+
+if (!hasValidConfig) {
+  console.error(
+    'Supabase env vars are missing or still placeholders. Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in your host (Vercel/Netlify), then redeploy.',
   )
 }
 
-// Placeholder values keep the UI bootable when env is not set yet.
 export const supabase = createClient(
   supabaseUrl || 'https://placeholder.supabase.co',
   supabaseKey || 'placeholder-key',
 )
+
+export function assertSupabaseConfigured() {
+  if (!hasValidConfig) {
+    throw new Error(
+      'App is not connected to Supabase. Add VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in your deploy settings, then redeploy.',
+    )
+  }
+}
