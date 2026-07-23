@@ -34,6 +34,12 @@ async function onSubmit() {
 
 <template>
   <main class="mx-auto flex min-h-screen max-w-md flex-col justify-center px-4 py-10">
+    <RouterLink
+      class="mb-6 w-fit text-sm text-mist transition hover:text-foam"
+      :to="{ name: 'home' }"
+    >
+      ← Back to home
+    </RouterLink>
     <div class="mb-8 text-center">
       <p class="font-display text-sm tracking-[0.2em] text-accent uppercase">Backlog Shelf</p>
       <h1 class="mt-2 font-display text-3xl font-semibold text-foam">Create account</h1>

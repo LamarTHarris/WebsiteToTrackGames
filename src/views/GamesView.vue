@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, RouterLink } from 'vue-router'
 import { LogOut, Plus } from 'lucide-vue-next'
 import GameForm from '../components/GameForm.vue'
 import GameRow from '../components/GameRow.vue'
@@ -73,7 +73,7 @@ async function onRemove(game: Game) {
 
 async function onSignOut() {
   await auth.signOut()
-  await router.replace({ name: 'login' })
+  await router.replace({ name: 'home' })
 }
 
 function setFilter(value: GameStatus | 'all') {
@@ -85,7 +85,12 @@ function setFilter(value: GameStatus | 'all') {
   <div class="mx-auto max-w-6xl px-4 py-8">
     <header class="mb-8 flex flex-wrap items-end justify-between gap-4">
       <div>
-        <p class="font-display text-sm tracking-[0.2em] text-accent uppercase">Backlog Shelf</p>
+        <RouterLink
+          class="font-display text-sm tracking-[0.2em] text-accent uppercase hover:underline"
+          :to="{ name: 'home' }"
+        >
+          Backlog Shelf
+        </RouterLink>
         <h1 class="mt-1 font-display text-3xl font-semibold text-foam md:text-4xl">
           Your games
         </h1>
