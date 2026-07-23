@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import type { Session, User } from '@supabase/supabase-js'
-import { supabase } from '../lib/supabase'
+import { assertSupabaseConfigured, supabase } from '../lib/supabase'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
@@ -38,6 +38,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function signIn(email: string, password: string) {
     error.value = null
+    assertSupabaseConfigured()
     const { data, error: signInError } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -52,6 +53,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function signUp(email: string, password: string) {
     error.value = null
+    assertSupabaseConfigured()
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
