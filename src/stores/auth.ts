@@ -39,8 +39,9 @@ export const useAuthStore = defineStore('auth', () => {
   async function signIn(email: string, password: string) {
     error.value = null
     assertSupabaseConfigured()
+    const normalizedEmail = email.trim().toLowerCase()
     const { data, error: signInError } = await supabase.auth.signInWithPassword({
-      email,
+      email: normalizedEmail,
       password,
     })
     if (signInError) {
@@ -54,14 +55,30 @@ export const useAuthStore = defineStore('auth', () => {
   async function signUp(email: string, password: string) {
     error.value = null
     assertSupabaseConfigured()
+    const normalizedEmail = email.trim().toLowerCase()
     const { data, error: signUpError } = await supabase.auth.signUp({
-      email,
+      email: normalizedEmail,
       password,
     })
+
     if (signUpError) {
-      error.value = signUpError.message
-      throw signUpError
+      const message = /already|registered|exists/i.test(signUpError.message)
+        ? 'An account with this email already exists. Try signing in instead.'
+        : signUpError.message
+      error.value = message
+      throw new Error(message)
     }
+
+    // When email confirmation is on, Supabase may return a user with no identities
+    // for an existing email (avoids leaking whether the email is taken).
+    const identities = data.user?.identities ?? []
+    if (data.user && identities.length === 0) {
+      const message =
+        'An account with this email already exists. Try signing in instead.'
+      error.value = message
+      throw new Error(message)
+    }
+
     session.value = data.session
     user.value = data.user
     return data
