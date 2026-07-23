@@ -17,13 +17,13 @@ async function onSubmit() {
   localError.value = null
   info.value = null
   try {
-    const result = await auth.signUp(email.value.trim(), password.value)
+    const result = await auth.signUp(email.value.trim().toLowerCase(), password.value)
     if (result.session) {
       await router.replace({ name: 'games' })
       return
     }
     info.value =
-      'Account created. Check your email to confirm, then sign in. (If email confirmation is disabled in Supabase, try signing in now.)'
+      'Account created. Check your email to confirm, then sign in.'
   } catch (err) {
     localError.value = err instanceof Error ? err.message : 'Unable to create account.'
   } finally {
