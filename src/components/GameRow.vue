@@ -33,7 +33,7 @@ function formatDate(value: string | null) {
       {{ game.platform || '—' }}
     </td>
     <td class="hidden px-3 py-3 align-top text-sm text-mist lg:table-cell">
-      {{ formatDate(game.release_date) }}
+      {{ formatDate(game.last_played_date) }}
     </td>
     <td class="hidden px-3 py-3 align-top text-sm text-mist lg:table-cell">
       {{ formatDate(game.started_at) }}
@@ -47,22 +47,6 @@ function formatDate(value: string | null) {
       <p class="mt-1 text-xs text-mist lg:hidden">
         Started {{ formatDate(game.started_at) }}
       </p>
-    </td>
-    <td class="px-3 py-3 align-top text-sm text-mist">
-      <template v-if="game.progress_percent === null || game.progress_percent === undefined">
-        —
-      </template>
-      <template v-else>
-        <div class="flex items-center gap-2">
-          <div class="h-1.5 w-16 overflow-hidden rounded-full bg-ink">
-            <div
-              class="h-full rounded-full bg-accent"
-              :style="{ width: `${game.progress_percent}%` }"
-            />
-          </div>
-          <span>{{ game.progress_percent }}%</span>
-        </div>
-      </template>
     </td>
     <td class="px-3 py-3 align-top">
       <div class="flex justify-end gap-1">

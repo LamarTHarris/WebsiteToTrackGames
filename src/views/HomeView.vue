@@ -3,10 +3,43 @@ import { RouterLink } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 
 const auth = useAuthStore()
+
+const shelves = [
+  ['Hades II', 'Expedition 33', 'Silksong','Assassin\'s Creed', 'The Witcher'],
+  ['Death Stranding 2', 'Metaphor', 'Blue Prince','Pokemon', 'The Legend of Zelda'],
+  ['Doom: The Dark Ages', 'Chrono Trigger', 'Kingdom Come','The Last of Us', 'The Elder Scrolls'],
+  ['Clair Obscur', 'The Witcher', 'The Legend of Zelda','The Witcher', 'The Binding of Isaac'],
+  ['Kingdom Come', 'The Elder Scrolls', 'The Binding of Isaac','The Legend of Zelda', 'The Last of Us'],
+] as const
 </script>
 
 <template>
   <div class="home">
+    <div class="home-stage" aria-hidden="true">
+      <div class="home-stage__glow" />
+      <div class="bookshelf">
+        <div class="bookshelf__case">
+          <div
+            v-for="(shelf, shelfIndex) in shelves"
+            :key="shelfIndex"
+            class="bookshelf__shelf"
+            :style="{ '--shelf': shelfIndex }"
+          >
+            <ul class="bookshelf__spines">
+              <li
+                v-for="(title, bookIndex) in shelf"
+                :key="title"
+                :style="{ '--i': bookIndex }"
+              >
+                {{ title }}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="home-scrim" />
+    </div>
+
     <header class="home-nav">
       <RouterLink class="home-nav__brand" :to="{ name: 'home' }">Backlog Shelf</RouterLink>
       <nav class="home-nav__links">
@@ -21,47 +54,27 @@ const auth = useAuthStore()
     </header>
 
     <section class="home-hero" aria-labelledby="home-headline">
-      <div class="home-hero__copy">
-        <p class="home-hero__brand">Backlog Shelf</p>
-        <h1 id="home-headline" class="home-hero__title">
-          Keep every game you mean to play in one place.
-        </h1>
-        <p class="home-hero__lede">
-          Track start dates, platforms, release dates, and how far you’ve gotten — then pick up where you left off.
-        </p>
-        <div class="home-hero__actions">
-          <RouterLink
-            v-if="auth.isAuthenticated"
-            class="home-hero__primary"
-            :to="{ name: 'games' }"
-          >
-            Go to your list
+      <p class="home-hero__brand">Backlog Shelf</p>
+      <h1 id="home-headline" class="home-hero__title">Track the games you’ll play.</h1>
+      <p class="home-hero__lede">
+        Start date, progress, platform, and release — one personal shelf.
+      </p>
+      <div class="home-hero__actions">
+        <RouterLink
+          v-if="auth.isAuthenticated"
+          class="home-hero__primary"
+          :to="{ name: 'games' }"
+        >
+          Open my list
+        </RouterLink>
+        <template v-else>
+          <RouterLink class="home-hero__primary" :to="{ name: 'register' }">
+            Get started
           </RouterLink>
-          <template v-else>
-            <RouterLink class="home-hero__primary" :to="{ name: 'register' }">
-              Create free account
-            </RouterLink>
-            <RouterLink class="home-hero__secondary" :to="{ name: 'login' }">
-              Log in
-            </RouterLink>
-          </template>
-        </div>
-      </div>
-
-      <div class="home-hero__stage" aria-hidden="true">
-        <div class="home-shelf">
-          <div class="home-shelf__glow" />
-          <ul class="home-shelf__spines">
-            <li style="--i: 0">Hades II</li>
-            <li style="--i: 1">Expedition 33</li>
-            <li style="--i: 2">Silksong</li>
-            <li style="--i: 3">Death Stranding 2</li>
-            <li style="--i: 4">Metaphor</li>
-            <li style="--i: 5">Blue Prince</li>
-            <li style="--i: 6">Doom: The Dark Ages</li>
-          </ul>
-          <div class="home-shelf__ledge" />
-        </div>
+          <RouterLink class="home-hero__secondary" :to="{ name: 'login' }">
+            Log in
+          </RouterLink>
+        </template>
       </div>
     </section>
   </div>
@@ -69,20 +82,173 @@ const auth = useAuthStore()
 
 <style scoped>
 .home {
+  position: relative;
   min-height: 100vh;
+  min-height: 100dvh;
   overflow: clip;
+  display: flex;
+  flex-direction: column;
+}
+
+.home-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: clamp(5rem, 12vh, 7rem) clamp(1rem, 4vw, 3.5rem) clamp(1.5rem, 4vh, 3rem);
+  animation: stage-in 900ms ease both;
+}
+
+.home-stage__glow {
+  position: absolute;
+  inset: 18% 6% auto auto;
+  width: min(34rem, 58vw);
+  height: 58%;
+  background: radial-gradient(
+    ellipse at 70% 45%,
+    color-mix(in oklab, var(--color-accent) 22%, transparent),
+    transparent 70%
+  );
+  filter: blur(12px);
+  animation: pulse-glow 5s ease-in-out infinite;
+}
+
+.bookshelf {
+  position: relative;
+  z-index: 1;
+  width: min(22rem, 44vw);
+  animation: case-in 800ms ease both;
+}
+
+.bookshelf__case {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0.85rem 0.7rem 0.75rem;
+  border-radius: 0.35rem 0.35rem 0.2rem 0.2rem;
+  background:
+    linear-gradient(180deg, #4a3426 0%, #342318 18%, #2a1c14 100%);
+  box-shadow:
+    inset 0 0 0 2px #5a4030,
+    inset 0 0 0 5px #2b1c13,
+    0 24px 50px rgb(0 0 0 / 0.45);
+}
+
+.bookshelf__case::before,
+.bookshelf__case::after {
+  content: '';
+  position: absolute;
+  top: 0.55rem;
+  bottom: 0.55rem;
+  width: 0.45rem;
+  background: linear-gradient(180deg, #5c4030, #3a271c 50%, #2a1c14);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, white 8%, transparent);
+}
+
+.bookshelf__case::before {
+  left: 0.2rem;
+}
+
+.bookshelf__case::after {
+  right: 0.2rem;
+}
+
+.bookshelf__shelf {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: clamp(6.5rem, 14vh, 8.5rem);
+  padding: 0.35rem 0.55rem 0;
+  background: linear-gradient(180deg, #1a120e 0%, #241812 70%, #1c130f 100%);
+}
+
+.bookshelf__shelf::after {
+  content: '';
+  display: block;
+  height: 0.55rem;
+  margin: 0 -0.15rem;
+  border-radius: 0.08rem;
+  background: linear-gradient(180deg, #6a4a36, #3f2a1e 55%, #2c1d14);
+  box-shadow: 0 6px 12px rgb(0 0 0 / 0.35);
+}
+
+.bookshelf__spines {
+  list-style: none;
+  margin: 0;
+  padding: 0 0.15rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: clamp(4.8rem, 11vh, 6.8rem);
+}
+
+.bookshelf__spines li {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(1.85rem, 3.6vw, 2.55rem);
+  height: calc(clamp(4.2rem, 10vh, 6rem) + (var(--i) * 0.45rem));
+  border-radius: 0.28rem 0.28rem 0.1rem 0.1rem;
+  font-family: var(--font-display);
+  font-size: clamp(0.58rem, 1vw, 0.72rem);
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--color-foam);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, white 12%, transparent);
+  animation: spine-settle 700ms calc(120ms + (var(--shelf) * 160ms) + (var(--i) * 55ms)) ease both;
+}
+
+.bookshelf__spines li:nth-child(odd) {
+  background: linear-gradient(180deg, #25463d, #163029);
+}
+
+.bookshelf__spines li:nth-child(even) {
+  background: linear-gradient(180deg, #2a3f55, #172533);
+}
+
+.bookshelf__shelf:nth-child(2) .bookshelf__spines li:nth-child(2) {
+  background: linear-gradient(180deg, #3a2f4d, #21182c);
+}
+
+.bookshelf__shelf:nth-child(3) .bookshelf__spines li:nth-child(1) {
+  background: linear-gradient(180deg, #4a3a28, #2a2016);
+}
+
+.home-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      105deg,
+      rgb(8 14 13 / 0.92) 0%,
+      rgb(8 14 13 / 0.78) 38%,
+      rgb(8 14 13 / 0.35) 62%,
+      rgb(8 14 13 / 0.2) 100%
+    ),
+    linear-gradient(180deg, rgb(8 14 13 / 0.55) 0%, transparent 35%, rgb(8 14 13 / 0.5) 100%);
 }
 
 .home-nav {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1.25rem 1.5rem;
-  max-width: 72rem;
+  width: min(72rem, 100%);
   margin: 0 auto;
+  padding: 1.25rem 1.5rem;
+  animation: rise-in 500ms ease both;
 }
 
 .home-nav__brand {
@@ -136,56 +302,43 @@ const auth = useAuthStore()
 
 .home-hero {
   position: relative;
-  display: grid;
-  min-height: calc(100vh - 4.5rem);
-  align-items: center;
-  gap: 2rem;
-  max-width: 72rem;
-  margin: 0 auto;
-  padding: 1rem 1.5rem 3rem;
-}
-
-@media (min-width: 900px) {
-  .home-hero {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
-    gap: 3rem;
-    padding-top: 0;
-  }
-}
-
-.home-hero__copy {
-  position: relative;
-  z-index: 1;
-  max-width: 34rem;
-  animation: rise-in 700ms ease both;
+  z-index: 3;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: min(36rem, 100%);
+  margin: 0 auto 0 max(1.5rem, calc((100% - 72rem) / 2 + 1.5rem));
+  padding: 1.5rem 1.5rem 4rem 0;
+  animation: rise-in 700ms 80ms ease both;
 }
 
 .home-hero__brand {
-  margin: 0 0 0.85rem;
+  margin: 0 0 0.9rem;
   font-family: var(--font-display);
-  font-size: clamp(2rem, 5vw, 3.4rem);
+  font-size: clamp(2.75rem, 8vw, 4.75rem);
   font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1;
-  color: var(--color-accent);
+  letter-spacing: -0.035em;
+  line-height: 0.92;
+  color: var(--color-foam);
 }
 
 .home-hero__title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(1.55rem, 3.4vw, 2.35rem);
-  font-weight: 600;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  color: var(--color-foam);
+  font-size: clamp(1.25rem, 2.8vw, 1.75rem);
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  color: color-mix(in oklab, var(--color-foam) 88%, var(--color-mist));
 }
 
 .home-hero__lede {
-  margin: 1rem 0 0;
-  max-width: 30rem;
+  margin: 0.85rem 0 0;
+  max-width: 28rem;
   color: var(--color-mist);
-  font-size: 1.05rem;
-  line-height: 1.55;
+  font-size: 1.02rem;
+  line-height: 1.5;
 }
 
 .home-hero__actions {
@@ -198,7 +351,7 @@ const auth = useAuthStore()
 .home-hero__primary {
   background: var(--color-accent);
   color: var(--color-ink);
-  padding: 0.8rem 1.2rem;
+  padding: 0.85rem 1.25rem;
 }
 
 .home-hero__primary:hover {
@@ -208,108 +361,22 @@ const auth = useAuthStore()
 }
 
 .home-hero__secondary {
-  border: 1px solid var(--color-line);
+  border: 1px solid color-mix(in oklab, var(--color-foam) 28%, var(--color-line));
   color: var(--color-foam);
-  padding: 0.8rem 1.2rem;
+  padding: 0.85rem 1.25rem;
+  background: color-mix(in oklab, var(--color-ink) 35%, transparent);
+  backdrop-filter: blur(6px);
 }
 
 .home-hero__secondary:hover {
-  border-color: color-mix(in oklab, var(--color-foam) 35%, var(--color-line));
+  border-color: color-mix(in oklab, var(--color-foam) 50%, var(--color-line));
   transform: translateY(-1px);
-}
-
-.home-hero__stage {
-  position: relative;
-  min-height: 18rem;
-  animation: fade-slide 900ms 120ms ease both;
-}
-
-@media (min-width: 900px) {
-  .home-hero__stage {
-    min-height: 28rem;
-  }
-}
-
-.home-shelf {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  align-content: end;
-  padding: 1.5rem 0.5rem 2rem;
-}
-
-.home-shelf__glow {
-  position: absolute;
-  inset: 8% 10% auto;
-  height: 55%;
-  background:
-    radial-gradient(ellipse at 50% 40%, color-mix(in oklab, var(--color-accent) 28%, transparent), transparent 70%);
-  filter: blur(8px);
-  animation: pulse-glow 4.5s ease-in-out infinite;
-}
-
-.home-shelf__spines {
-  position: relative;
-  z-index: 1;
-  list-style: none;
-  margin: 0;
-  padding: 0 0.75rem;
-  display: flex;
-  align-items: end;
-  justify-content: center;
-  gap: 0.55rem;
-  min-height: 14rem;
-}
-
-.home-shelf__spines li {
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: clamp(2.4rem, 5vw, 3.35rem);
-  height: calc(10rem + (var(--i) * 0.55rem));
-  border-radius: 0.35rem 0.35rem 0.15rem 0.15rem;
-  font-family: var(--font-display);
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--color-foam);
-  box-shadow: inset 0 0 0 1px color-mix(in oklab, white 12%, transparent);
-  animation: shelf-settle 800ms calc(180ms + var(--i) * 70ms) ease both;
-}
-
-.home-shelf__spines li:nth-child(odd) {
-  background: linear-gradient(180deg, #25463d, #163029);
-}
-
-.home-shelf__spines li:nth-child(even) {
-  background: linear-gradient(180deg, #2a3f55, #172533);
-}
-
-.home-shelf__spines li:nth-child(3) {
-  background: linear-gradient(180deg, #3a2f4d, #21182c);
-}
-
-.home-shelf__spines li:nth-child(5) {
-  background: linear-gradient(180deg, #4a3a28, #2a2016);
-}
-
-.home-shelf__ledge {
-  position: relative;
-  z-index: 1;
-  height: 0.85rem;
-  margin: 0 0.25rem;
-  border-radius: 0.2rem;
-  background: linear-gradient(180deg, #3d5a52, #243832 55%, #1a2824);
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
 }
 
 @keyframes rise-in {
   from {
     opacity: 0;
-    transform: translateY(18px);
+    transform: translateY(16px);
   }
   to {
     opacity: 1;
@@ -317,10 +384,19 @@ const auth = useAuthStore()
   }
 }
 
-@keyframes fade-slide {
+@keyframes stage-in {
   from {
     opacity: 0;
-    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes case-in {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
   }
   to {
     opacity: 1;
@@ -328,10 +404,10 @@ const auth = useAuthStore()
   }
 }
 
-@keyframes shelf-settle {
+@keyframes spine-settle {
   from {
     opacity: 0;
-    transform: rotate(180deg) translateY(24px);
+    transform: rotate(180deg) translateY(20px);
   }
   to {
     opacity: 1;
@@ -342,20 +418,69 @@ const auth = useAuthStore()
 @keyframes pulse-glow {
   0%,
   100% {
-    opacity: 0.55;
+    opacity: 0.5;
     transform: scale(0.98);
   }
   50% {
-    opacity: 0.9;
-    transform: scale(1.03);
+    opacity: 0.85;
+    transform: scale(1.04);
+  }
+}
+
+@media (max-width: 700px) {
+  .home-stage {
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 1rem;
+  }
+
+  .bookshelf {
+    width: min(18rem, 86vw);
+  }
+
+  .bookshelf__shelf {
+    min-height: 5.6rem;
+  }
+
+  .bookshelf__spines {
+    min-height: 4.2rem;
+  }
+
+  .bookshelf__spines li:nth-child(3) {
+    display: none;
+  }
+
+  .home-hero {
+    justify-content: flex-end;
+    padding-bottom: 2.5rem;
+    max-width: none;
+    margin-left: 1.5rem;
+    padding-left: 0;
+  }
+
+  .home-scrim {
+    background:
+      linear-gradient(180deg, rgb(8 14 13 / 0.7) 0%, rgb(8 14 13 / 0.35) 40%, rgb(8 14 13 / 0.88) 100%);
+  }
+
+  .home-hero__actions {
+    width: 100%;
+  }
+
+  .home-hero__primary,
+  .home-hero__secondary {
+    flex: 1 1 auto;
+    text-align: center;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .home-hero__copy,
-  .home-hero__stage,
-  .home-shelf__spines li,
-  .home-shelf__glow {
+  .home-nav,
+  .home-hero,
+  .home-stage,
+  .bookshelf,
+  .bookshelf__spines li,
+  .home-stage__glow {
     animation: none;
   }
 }

@@ -51,8 +51,7 @@ export const useGamesStore = defineStore('games', () => {
       .insert({
         ...payload,
         user_id: auth.user.id,
-        progress_percent: payload.progress_percent ?? null,
-        release_date: payload.release_date || null,
+        last_played_date: payload.last_played_date || null,
         started_at: payload.started_at || null,
       })
       .select()
@@ -73,14 +72,10 @@ export const useGamesStore = defineStore('games', () => {
       .from('games')
       .update({
         ...payload,
-        progress_percent:
-          payload.progress_percent === undefined
+        last_played_date:
+          payload.last_played_date === undefined
             ? undefined
-            : payload.progress_percent,
-        release_date:
-          payload.release_date === undefined
-            ? undefined
-            : payload.release_date || null,
+            : payload.last_played_date || null,
         started_at:
           payload.started_at === undefined
             ? undefined

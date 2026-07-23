@@ -7,15 +7,38 @@ create table if not exists public.games (
   user_id uuid not null references auth.users (id) on delete cascade,
   title text not null,
   platform text not null default '',
-  release_date date,
+  last_played_date date,
   started_at date,
   status text not null default 'want_to_play'
     check (status in ('want_to_play', 'playing', 'finished', 'dropped')),
-  progress_percent integer
-    check (progress_percent is null or (progress_percent >= 0 and progress_percent <= 100)),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+-- Migrate older schema versions (safe to re-run)
+alter table public.games add column if not exists last_played_date date;
+
+do $$
+begin
+  if exists (
+    select 1
+    from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'games'
+      and column_name = 'release_date'
+  ) and exists (
+    select 1
+    from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'games'
+      and column_name = 'last_played_date'
+  ) then
+    execute 'update public.games set last_played_date = release_date where last_played_date is null';
+  end if;
+end $$;
+
+alter table public.games drop column if exists release_date;
+alter table public.games drop column if exists progress_percent;
 
 create index if not exists games_user_id_idx on public.games (user_id);
 create index if not exists games_status_idx on public.games (user_id, status);

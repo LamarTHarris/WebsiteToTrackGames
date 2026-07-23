@@ -12,10 +12,9 @@ export interface Game {
   user_id: string
   title: string
   platform: string
-  release_date: string | null
+  last_played_date: string | null
   started_at: string | null
   status: GameStatus
-  progress_percent: number | null
   created_at: string
   updated_at: string
 }
@@ -23,10 +22,9 @@ export interface Game {
 export type GameInsert = {
   title: string
   platform: string
-  release_date?: string | null
+  last_played_date?: string | null
   started_at?: string | null
   status: GameStatus
-  progress_percent?: number | null
 }
 
 export type GameUpdate = Partial<GameInsert>

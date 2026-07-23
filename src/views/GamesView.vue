@@ -204,10 +204,9 @@ function setFilter(value: GameStatus | 'all') {
             <tr>
               <th class="px-3 py-3 font-medium">Title</th>
               <th class="hidden px-3 py-3 font-medium md:table-cell">Platform</th>
-              <th class="hidden px-3 py-3 font-medium lg:table-cell">Release</th>
+              <th class="hidden px-3 py-3 font-medium lg:table-cell">Last played</th>
               <th class="hidden px-3 py-3 font-medium lg:table-cell">Started</th>
               <th class="px-3 py-3 font-medium">Status</th>
-              <th class="px-3 py-3 font-medium">Progress</th>
               <th class="px-3 py-3 font-medium"><span class="sr-only">Actions</span></th>
             </tr>
           </thead>

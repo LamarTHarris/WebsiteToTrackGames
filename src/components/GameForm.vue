@@ -16,22 +16,17 @@ const emit = defineEmits<{
 const form = reactive({
   title: '',
   platform: '',
-  release_date: '',
+  last_played_date: '',
   started_at: '',
   status: 'want_to_play' as GameStatus,
-  progress_percent: '' as string,
 })
 
 function syncFromGame(game: Game | null | undefined) {
   form.title = game?.title ?? ''
   form.platform = game?.platform ?? ''
-  form.release_date = game?.release_date ?? ''
+  form.last_played_date = game?.last_played_date ?? ''
   form.started_at = game?.started_at ?? ''
   form.status = game?.status ?? 'want_to_play'
-  form.progress_percent =
-    game?.progress_percent === null || game?.progress_percent === undefined
-      ? ''
-      : String(game.progress_percent)
 }
 
 watch(
@@ -41,23 +36,12 @@ watch(
 )
 
 function onSubmit() {
-  const percentRaw = form.progress_percent.trim()
-  let progress_percent: number | null = null
-  if (percentRaw !== '') {
-    const parsed = Number(percentRaw)
-    if (Number.isNaN(parsed) || parsed < 0 || parsed > 100) {
-      return
-    }
-    progress_percent = Math.round(parsed)
-  }
-
   emit('submit', {
     title: form.title.trim(),
     platform: form.platform.trim(),
-    release_date: form.release_date || null,
+    last_played_date: form.last_played_date || null,
     started_at: form.started_at || null,
     status: form.status,
-    progress_percent,
   })
 }
 </script>
@@ -99,9 +83,9 @@ function onSubmit() {
     </label>
 
     <label>
-      <span class="mb-1.5 block text-sm text-mist">Release date</span>
+      <span class="mb-1.5 block text-sm text-mist">Last Played Date</span>
       <input
-        v-model="form.release_date"
+        v-model="form.last_played_date"
         type="date"
         class="w-full rounded-lg border border-line bg-ink/60 px-3 py-2 text-foam outline-none ring-accent/40 focus:ring-2"
       />
@@ -116,18 +100,6 @@ function onSubmit() {
       />
     </label>
 
-    <label class="md:col-span-2">
-      <span class="mb-1.5 block text-sm text-mist">Progress % (optional)</span>
-      <input
-        v-model="form.progress_percent"
-        type="number"
-        min="0"
-        max="100"
-        step="1"
-        class="w-full rounded-lg border border-line bg-ink/60 px-3 py-2 text-foam outline-none ring-accent/40 focus:ring-2"
-        placeholder="0–100"
-      />
-    </label>
 
     <div class="flex flex-wrap gap-3 md:col-span-2">
       <button
